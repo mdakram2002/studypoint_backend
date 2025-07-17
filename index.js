@@ -1,4 +1,3 @@
-
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -16,47 +15,44 @@ const fileUpload = require("express-fileupload");
 const dotenv = require("dotenv");
 
 dotenv.config();
-const PORT = process.env.PORT || 4000;
-const review = require("./controllers/RatingAndReview");
 
+// DB Connection
 database.connect();
+
+// Middlewares
 app.use(express.json());
 app.use(cookieParser());
 
 const corsOptions = {
-    origin: ["http://localhost:3000", "https://study-point.azurewebsites.net"],
-    credentials: true,
+  origin: ["http://localhost:3000", "https://study-point.azurewebsites.net"],
+  credentials: true,
 };
-
 app.use(cors(corsOptions));
 
 app.use(
-    fileUpload({
-        useTempFiles: true,
-        tempFileDir: '/tmp/',
-    })
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+  })
 );
 
-// cloudinary connection established and routes
+// Cloudinary
 cloudinaryConnect();
+
+// Routes
 app.use("/api/v1/auth", userRoute);
 app.use("/api/v1/profile", profileRoute);
 app.use("/api/v1/contact", contactRoute);
 app.use("/api/v1/course", courseRoute);
 app.use("/api/v1/payment", paymentRoute);
 
-app.use(express.static(path.join(__dirname, "../build")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../build", "index.html"));
-});
-
+// Health Check Route
 app.get("/", (req, res) => {
-    return res.json({
-        success: true,
-        message: "Your server is up and running...",
-    });
+  return res.json({
+    success: true,
+    message: "StudyPoint backend is working 🚀",
+  });
 });
 
-app.listen(PORT, () => {
-    console.log(`App is running on ${PORT}`);
-});
+// Export app for Vercel
+module.exports = app;
